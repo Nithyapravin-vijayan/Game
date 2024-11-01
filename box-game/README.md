@@ -40,7 +40,8 @@ To run the game locally, clone the repository and open `index.html` in your brow
 ```bash
 git clone https://github.com/Nithyapravin-vijayan/Game.git
 cd Game
-open index.html
+open terminal
+npm run dev
 
 
 
