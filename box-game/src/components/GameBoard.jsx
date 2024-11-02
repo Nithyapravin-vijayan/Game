@@ -13,6 +13,8 @@ const GameBoard = ({ onGameOver }) => {
     const [distanceMessage, setDistanceMessage] = useState('');
     const [player1QuestionCount, setPlayer1QuestionCount] = useState(0);
     const [player2QuestionCount, setPlayer2QuestionCount] = useState(0);
+    const [player1Visited, setPlayer1Visited] = useState(new Set([4]));
+    const [player2Visited, setPlayer2Visited] = useState(new Set([5]));
 
     useEffect(() => {
         if (!gameOver && (player1QuestionCount < 5 || player2QuestionCount < 5)) {
@@ -28,15 +30,17 @@ const GameBoard = ({ onGameOver }) => {
             if (!stay && player1Pos > 0) {
                 newPlayer1Pos = player1Pos - 1;
                 setPlayer1Pos(newPlayer1Pos);
+                setPlayer1Visited(new Set(player1Visited).add(newPlayer1Pos));
             }
-            setPlayer1QuestionCount(player1QuestionCount + 1); // Increment player 1's question count
+            setPlayer1QuestionCount(player1QuestionCount + 1);
             setCurrentPlayer(2);
         } else {
             if (!stay && player2Pos < 9) {
                 newPlayer2Pos = player2Pos + 1;
                 setPlayer2Pos(newPlayer2Pos);
+                setPlayer2Visited(new Set(player2Visited).add(newPlayer2Pos));
             }
-            setPlayer2QuestionCount(player2QuestionCount + 1); // Increment player 2's question count
+            setPlayer2QuestionCount(player2QuestionCount + 1);
             setCurrentPlayer(1);
         }
 
@@ -52,15 +56,24 @@ const GameBoard = ({ onGameOver }) => {
         const newTurnCount = turnCount + 1;
         setTurnCount(newTurnCount);
 
-        // Check if both players have answered 5 questions each
         if (player1QuestionCount + player2QuestionCount >= 9) { // Total 10 questions
-            const distance = Math.abs(newPlayer1Pos - newPlayer2Pos);
-            console.log(`Player 1 Position: ${newPlayer1Pos}, Player 2 Position: ${newPlayer2Pos}, Distance: ${distance}`);
+            const distance = calculateVisitedDistance();
+            console.log(`Distance between visited boxes: ${distance}`);
             setGameOver(true);
-            setShowModal(false); // Hide the turn modal when the game is over
-            setDistanceMessage(`Distance between players: ${distance} boxes.`);
-            onGameOver(`Distance between players: ${distance} boxes.`);
+            setShowModal(false);
+            setDistanceMessage(`Distance between visited boxes: ${distance} boxes.`);
+            onGameOver(`Distance between visited boxes: ${distance} boxes.`);
         }
+    };
+
+    const calculateVisitedDistance = () => {
+        // Combine visited boxes of both players into a single set, excluding current positions
+        const uniqueVisitedBoxes = new Set([
+            ...Array.from(player1Visited).filter(pos => pos !== player1Pos),
+            ...Array.from(player2Visited).filter(pos => pos !== player2Pos),
+        ]);
+
+        return uniqueVisitedBoxes.size; // Total count of unique visited boxes
     };
 
     const handlePlayerDecision = (stay) => {
@@ -79,6 +92,8 @@ const GameBoard = ({ onGameOver }) => {
         setDistanceMessage('');
         setPlayer1QuestionCount(0);
         setPlayer2QuestionCount(0);
+        setPlayer1Visited(new Set([4]));
+        setPlayer2Visited(new Set([5]));
     };
 
     return (
