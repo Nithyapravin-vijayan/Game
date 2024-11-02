@@ -10,10 +10,12 @@ const GameBoard = ({ onGameOver }) => {
     const [turnCount, setTurnCount] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [gameOver, setGameOver] = useState(false);
-    const [distanceMessage, setDistanceMessage] = useState(''); // New state for the distance message
+    const [distanceMessage, setDistanceMessage] = useState('');
+    const [player1QuestionCount, setPlayer1QuestionCount] = useState(0);
+    const [player2QuestionCount, setPlayer2QuestionCount] = useState(0);
 
     useEffect(() => {
-        if (!gameOver) {
+        if (!gameOver && (player1QuestionCount < 5 || player2QuestionCount < 5)) {
             setShowModal(true);
         }
     }, [currentPlayer, gameOver]);
@@ -27,12 +29,14 @@ const GameBoard = ({ onGameOver }) => {
                 newPlayer1Pos = player1Pos - 1;
                 setPlayer1Pos(newPlayer1Pos);
             }
+            setPlayer1QuestionCount(player1QuestionCount + 1); // Increment player 1's question count
             setCurrentPlayer(2);
         } else {
             if (!stay && player2Pos < 9) {
                 newPlayer2Pos = player2Pos + 1;
                 setPlayer2Pos(newPlayer2Pos);
             }
+            setPlayer2QuestionCount(player2QuestionCount + 1); // Increment player 2's question count
             setCurrentPlayer(1);
         }
 
@@ -47,7 +51,9 @@ const GameBoard = ({ onGameOver }) => {
 
         const newTurnCount = turnCount + 1;
         setTurnCount(newTurnCount);
-        if (newTurnCount >= 5) {
+
+        // Check if both players have answered 5 questions each
+        if (player1QuestionCount + player2QuestionCount >= 9) { // Total 10 questions
             const distance = Math.abs(newPlayer1Pos - newPlayer2Pos);
             console.log(`Player 1 Position: ${newPlayer1Pos}, Player 2 Position: ${newPlayer2Pos}, Distance: ${distance}`);
             setGameOver(true);
@@ -70,7 +76,9 @@ const GameBoard = ({ onGameOver }) => {
         setTurnCount(0);
         setShowModal(false);
         setGameOver(false);
-        setDistanceMessage(''); // Reset the distance message
+        setDistanceMessage('');
+        setPlayer1QuestionCount(0);
+        setPlayer2QuestionCount(0);
     };
 
     return (
@@ -112,7 +120,7 @@ const GameBoard = ({ onGameOver }) => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>Game Over</h3>
-                        <p>{distanceMessage}</p> {/* Show the distance message */}
+                        <p>{distanceMessage}</p>
                         <p>The game has ended. Would you like to start a new game?</p>
                         <button onClick={resetGame} className="reset-button">New Game</button>
                     </div>
