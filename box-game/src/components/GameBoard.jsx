@@ -10,6 +10,7 @@ const GameBoard = ({ onGameOver }) => {
     const [turnCount, setTurnCount] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [gameOver, setGameOver] = useState(false);
+    const [distanceMessage, setDistanceMessage] = useState(''); // New state for the distance message
 
     useEffect(() => {
         if (!gameOver) {
@@ -48,8 +49,10 @@ const GameBoard = ({ onGameOver }) => {
         setTurnCount(newTurnCount);
         if (newTurnCount >= 5) {
             const distance = Math.abs(newPlayer1Pos - newPlayer2Pos);
+            console.log(`Player 1 Position: ${newPlayer1Pos}, Player 2 Position: ${newPlayer2Pos}, Distance: ${distance}`);
             setGameOver(true);
             setShowModal(false); // Hide the turn modal when the game is over
+            setDistanceMessage(`Distance between players: ${distance} boxes.`);
             onGameOver(`Distance between players: ${distance} boxes.`);
         }
     };
@@ -67,6 +70,7 @@ const GameBoard = ({ onGameOver }) => {
         setTurnCount(0);
         setShowModal(false);
         setGameOver(false);
+        setDistanceMessage(''); // Reset the distance message
     };
 
     return (
@@ -108,6 +112,7 @@ const GameBoard = ({ onGameOver }) => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>Game Over</h3>
+                        <p>{distanceMessage}</p> {/* Show the distance message */}
                         <p>The game has ended. Would you like to start a new game?</p>
                         <button onClick={resetGame} className="reset-button">New Game</button>
                     </div>
